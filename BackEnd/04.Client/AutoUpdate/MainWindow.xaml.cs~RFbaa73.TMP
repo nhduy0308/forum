@@ -1,0 +1,125 @@
+﻿using AutoUpdate.Common;
+using Entity;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.ServiceProcess;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace AutoUpdate
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+        private IEnumerable<FileResult> Files { get; set; }
+        private BackgroundWorker worker = new BackgroundWorker();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.progress.Value = 0;
+            this.worker.DoWork += Worker_DoWork;
+            this.worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            if (!this.worker.IsBusy)
+            {
+                this.worker.RunWorkerAsync();
+            }
+        }
+
+        private void UnistallService(FileResult file)
+        {
+            ServiceInstaller ServiceInstallerObj = new ServiceInstaller();
+            ServiceInstallerObj.ServiceName = "MyService";
+            ServiceInstallerObj.Uninstall(null);
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                var fileName = "Launcher.exe";
+                if (File.Exists(fileName))
+                {
+                    Process process = new Process();
+                    process.StartInfo.FileName = "Launcher.exe";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.Arguments = "commit";
+                    process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+                    process.Start();
+                }
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                Environment.Exit(0);
+            }
+            
+        }
+        private void CallBack(Action action)
+        {
+            this.Dispatcher.Invoke(action);
+        }
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                var files = RequestBase.Get<FileResult>("/api/autoupdate");
+                files.Wait();
+                this.Files = files.Result;
+                this.CallBack(() =>
+                {
+                    this.progress.Maximum = this.Files.Count();
+                    this.progress.Minimum = 0;
+                });
+
+                if (this.Files.Any())
+                {
+                    foreach (var file in this.Files)
+                    {
+                        if (File.Exists(file.Name))
+                        {
+                            var f = new FileInfo(file.Name);
+                            if (f.Length.Equals(file.Version))
+                            {
+                                continue;
+                            }
+                        }
+                        if (file.Service)
+                        {
+                            UnistallService(file);
+                        }
+                        RequestBase.DownloadFile(file);
+                        this.CallBack(() =>
+                        {
+                            ++this.progress.Value;
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                Environment.Exit(0);
+            }
+        }
+    }
+}

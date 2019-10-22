@@ -1,0 +1,23 @@
+﻿<Window x:Class="AutoUpdate.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutoUpdate"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Title="Auto Update"
+        Height="500" 
+        Loaded="Window_Loaded"
+        Width="730">
+    <Window.Background>
+        <ImageBrush x:Name="bg" ImageSource="img/Logo4.bmp"/>
+    </Window.Background>
+    <Grid Name="g">
+        <Image Margin="61,438,637,24" Source="img/Capture.PNG" >
+        <Image Margin="90,438,637,24" Source="img/Capture.PNG" >
+        </Image>
+    </Grid>
+</Window>

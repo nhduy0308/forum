@@ -1,0 +1,38 @@
+<div class="wrapper">
+    <app-header></app-header>
+    <!-- .header-->
+
+    <div class="container flex-s">
+        <app-left-side-bar></app-left-side-bar>
+        <!-- left-sidebar -->
+        <router-outlet></router-outlet>
+
+
+        <!-- .content -->
+        <app-right-side-bar></app-right-side-bar>
+        <!-- right-sidebar -->
+    </div>
+    <!-- .container-->
+
+    <footer class="footer">
+        <div class="fire-blue fire">
+        </div>
+        <div class="fire-red fire">
+        </div>
+        <ul class="f-menu">
+            <li><a [routerLink]="['/']">Home</a></li>
+            <li><a [routerLink]="['/']">Forums</a></li>
+            <li><a [routerLink]="['/']">Downloads</a></li>
+            <li><a [routerLink]="['/']">Register</a></li>
+            <li><a [routerLink]="['/']">Rules</a></li>
+            <li><a [routerLink]="['/']" target="_blank">EPvP</a></li>
+        </ul>
+        <!-- f-menu -->
+        <div class="copyright">
+            COPYRIGHT 2019 © «<a href="">Remnant-Gaming</a>». <br> ALL RIGHTS RESERVED.
+        </div>
+        <!-- copyright -->
+    </footer>
+    <!-- .footer -->
+
+</div>
